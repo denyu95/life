@@ -3,27 +3,33 @@ package main
 import (
 	"github.com/denyu95/life/cmd"
 	"github.com/denyu95/life/pkg/db"
+	"github.com/denyu95/life/pkg/log"
 	"github.com/urfave/cli"
-	"log"
 	"os"
 	"os/signal"
 )
 
 const Version = "1.0"
 
+type Param struct {
+	A string `json:"a"`
+	B string `json:"b"`
+}
+
 func main() {
 	c := make(chan os.Signal)
 	signal.Notify(c)
 	defer func() {
-		log.Println("...关闭数据库连接...")
+		log.Info("...关闭数据库连接...")
 		db.GetDB().Close()
-		log.Println("...结束...")
+		log.Info("...结束...")
 	}()
 
-	log.Println("...开始...")
+	log.WithField("key", "value").Info("...开始...")
+
 	go do()
 	<-c
-	log.Println("...外部强制停止...")
+	log.Warn("...外部强制停止...")
 }
 
 func do() {

@@ -1,13 +1,17 @@
 package log
 
 import (
+	"bufio"
 	"fmt"
+	"os"
+	"time"
 
+	rotatelogs "github.com/lestrrat-go/file-rotatelogs"
+	"github.com/rifflock/lfshook"
 	"github.com/sirupsen/logrus"
-	"server.paperang.com/servertools/convertor"
-)
 
-var Logger *logrus.Logger
+	"github.com/denyu95/life/pkg/convert"
+)
 
 type MyFormatter struct {
 	TimestampFormat  string
@@ -15,10 +19,25 @@ type MyFormatter struct {
 	DisableFileLine  bool
 }
 
-func init() {
-	Logger = logrus.New()
-	Logger.SetReportCaller(true)
-	Logger.SetFormatter(&MyFormatter{})
+// @title	Init
+// @description	日志初始化动作
+// @param	path			string	"需要传文件的绝对路径"
+// @param	rotationTime	time	"日志分割时间"
+// @param	maxAge			time	"日志保留时间"
+func Init(outPath string, rotationTime, maxAge time.Duration) {
+	if outPath != "" {
+		logrus.AddHook(newLfsHook(outPath, rotationTime, maxAge))
+		// 控制台不输出
+		src, err := os.OpenFile(os.DevNull, os.O_APPEND|os.O_WRONLY, os.ModeAppend)
+		if err != nil {
+			fmt.Println("Open Src File err", err)
+		}
+		writer := bufio.NewWriter(src)
+		logrus.SetOutput(writer)
+	} else {
+		logrus.SetReportCaller(true)
+		logrus.SetFormatter(&MyFormatter{})
+	}
 }
 
 func (m *MyFormatter) Format(entry *logrus.Entry) ([]byte, error) {
@@ -60,7 +79,7 @@ func (m *MyFormatter) Format(entry *logrus.Entry) ([]byte, error) {
 	}
 
 	for k, v := range data {
-		strV, _ := convertor.ToString(v)
+		strV, _ := convert.ToString(v)
 		output += " " + k + "[" + strV + "]"
 	}
 
@@ -69,18 +88,46 @@ func (m *MyFormatter) Format(entry *logrus.Entry) ([]byte, error) {
 	return []byte(output), nil
 }
 
-func WithFields(fields map[string]interface{}) *logrus.Entry {
-	return Logger.WithFields(fields)
-}
+func newLfsHook(path string, rotationTime, maxAge time.Duration) logrus.Hook {
+	infoWriter, err := rotatelogs.New(
+		path+".%Y%m%d%H%M",
+		// WithLinkName为最新的日志建立软连接，以方便随着找到当前日志文件
+		rotatelogs.WithLinkName(path),
 
-func WithField(key, value string) *logrus.Entry {
-	return Logger.WithField(key, value)
-}
+		// WithRotationTime设置日志分割的时间，这里设置为一小时分割一次
+		rotatelogs.WithRotationTime(time.Minute),
 
-func Warn(arg ...interface{}) {
-	Logger.Warn(arg...)
-}
+		// WithMaxAge和WithRotationCount二者只能设置一个，
+		// WithMaxAge设置文件清理前的最长保存时间，
+		// WithRotationCount设置文件清理前最多保存的个数。
+		rotatelogs.WithMaxAge(maxAge),
+		//rotatelogs.WithRotationCount(maxRemainCnt),
+	)
 
-func Info(arg ...interface{}) {
-	Logger.Info(arg...)
+	wfWriter, err := rotatelogs.New(
+		path+".wf"+".%Y%m%d%H%M",
+		// WithLinkName为最新的日志建立软连接，以方便随着找到当前日志文件
+		rotatelogs.WithLinkName(path+".wf"),
+
+		// WithRotationTime设置日志分割的时间，这里设置为一小时分割一次
+		rotatelogs.WithRotationTime(time.Minute),
+
+		// WithMaxAge和WithRotationCount二者只能设置一个，
+		// WithMaxAge设置文件清理前的最长保存时间，
+		// WithRotationCount设置文件清理前最多保存的个数。
+		rotatelogs.WithMaxAge(maxAge),
+		//rotatelogs.WithRotationCount(maxRemainCnt),
+	)
+
+	if err != nil {
+		logrus.Errorf("config local file system for logger error: %v", err)
+	}
+
+	logrus.SetReportCaller(true)
+	lfsHook := lfshook.NewHook(lfshook.WriterMap{
+		logrus.InfoLevel: infoWriter,
+		logrus.WarnLevel: wfWriter,
+	}, &MyFormatter{})
+
+	return lfsHook
 }

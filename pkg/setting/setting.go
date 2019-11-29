@@ -1,7 +1,8 @@
 package setting
 
 import (
-	"fmt"
+	"github.com/sirupsen/logrus"
+
 	"github.com/denyu95/life/pkg/ini"
 )
 
@@ -22,7 +23,7 @@ var (
 func init() {
 	ini, err := ini.NewIni("conf/app.ini")
 	if err != nil {
-		fmt.Println(err)
+		logrus.Warn(err)
 	}
 	// Api配置
 	Api.QQBaseUrl = ini.String("api", "qq.baseUrl")

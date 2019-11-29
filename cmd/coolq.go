@@ -2,13 +2,14 @@ package cmd
 
 import (
 	"encoding/json"
-	"fmt"
+	"io/ioutil"
+	"net/http"
+
+	"github.com/sirupsen/logrus"
+	"github.com/urfave/cli"
+
 	"github.com/denyu95/life/pkg/convert"
 	"github.com/denyu95/life/routes"
-	"github.com/urfave/cli"
-	"io/ioutil"
-	"log"
-	"net/http"
 )
 
 var Coolq = cli.Command{
@@ -22,7 +23,7 @@ func runCoolq(c *cli.Context) error {
 	http.HandleFunc("/", coolqEvent)
 	err := http.ListenAndServe(":8080", nil)
 	if err != nil {
-		fmt.Println(err)
+		logrus.Warn(err)
 	}
 	return err
 }
@@ -33,8 +34,6 @@ func coolqEvent(w http.ResponseWriter, r *http.Request) {
 	buf, _ := ioutil.ReadAll(r.Body)
 	m := map[string]interface{}{}
 	json.Unmarshal(buf, &m)
-	// 调试专用打印
-	fmt.Println(m)
 
 	strPostType, _ := convert.ToString(m["post_type"])
 	strMsgType, _ := convert.ToString(m["message_type"])
@@ -48,43 +47,42 @@ func coolqEvent(w http.ResponseWriter, r *http.Request) {
 	} else if strPostType == "request" {
 		requestTypeEvent(strReqType)
 	} else {
-		log.Println("QQ未知post请求", strPostType)
+		logrus.Info("QQ未知post请求", strPostType)
 	}
 }
 
 func msgTypeEvent(msgType string, param map[string]interface{}) {
 	if msgType == "private" {
-		log.Println("private")
 		routes.HandlePrivateMsg(param)
 	} else if msgType == "group" {
-		log.Println("group")
+		logrus.Info("group")
 	} else if msgType == "discuss" {
-		log.Println("discuss")
+		logrus.Info("discuss")
 	} else {
-		log.Println("QQ未知消息类型")
+		logrus.Info("QQ未知消息类型")
 	}
 }
 
 func eventTypeEvent(eventType string) {
 	if eventType == "group_upload" {
-		log.Println("group_upload")
+		logrus.Info("group_upload")
 	} else if eventType == "group_admin" {
-		log.Println("group_admin")
+		logrus.Info("group_admin")
 	} else if eventType == "group_decrease" {
-		log.Println("group_decrease")
+		logrus.Info("group_decrease")
 	} else if eventType == "group_increase" {
-		log.Println("group_increase")
+		logrus.Info("group_increase")
 	} else {
-		log.Println("QQ未知事件类型")
+		logrus.Info("QQ未知事件类型")
 	}
 }
 
 func requestTypeEvent(reqType string) {
 	if reqType == "friend" {
-		log.Println("friend")
+		logrus.Info("friend")
 	} else if reqType == "group" {
-		log.Println("group")
+		logrus.Info("group")
 	} else {
-		log.Println("QQ未知请求类型")
+		logrus.Info("QQ未知请求类型")
 	}
 }

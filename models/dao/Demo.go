@@ -1,8 +1,9 @@
 package dao
 
 import (
+	"github.com/sirupsen/logrus"
+
 	"github.com/denyu95/life/pkg/db"
-	"log"
 )
 
 type Demo struct {
@@ -17,6 +18,6 @@ func (Demo) TableName() string {
 func (d Demo) AddDemo() {
 	db := db.GetDB()
 	if err := db.Create(d).Error; err != nil {
-		log.Println("插入失败", err)
+		logrus.Warn(err)
 	}
 }

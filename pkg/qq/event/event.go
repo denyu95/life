@@ -1,9 +1,13 @@
 package event
 
 import (
-	"github.com/mitchellh/mapstructure"
-	"log"
+	"encoding/json"
+	"reflect"
 	"regexp"
+	"runtime"
+	"strings"
+
+	"github.com/sirupsen/logrus"
 )
 
 type QQEvent struct {
@@ -15,43 +19,49 @@ func NewQQEvent() *QQEvent {
 }
 
 type PrivateMsg struct {
-	Font        float64 `mapstructure:"font"`
-	Message     string  `mapstructure:"message"`
-	MessageId   int     `mapstructure:"message_id"`
-	MessageType string  `mapstructure:"message_type"`
-	PostType    string  `mapstructure:"post_type"`
-	RawMessage  string  `mapstructure:"raw_message"`
-	SelfId      float64 `mapstructure:"self_id"`
-	Sender      Sender  `mapstructure:"sender"`
-	SubType     string  `mapstructure:"sub_type"`
-	Time        float64 `mapstructure:"time"`
-	UserId      float64 `mapstructure:"user_id"`
+	Font        float64 `json:"font"`
+	Message     string  `json:"message"`
+	MessageId   int     `json:"message_id"`
+	MessageType string  `json:"message_type"`
+	PostType    string  `json:"post_type"`
+	RawMessage  string  `json:"raw_message"`
+	SelfId      float64 `json:"self_id"`
+	Sender      Sender  `json:"sender"`
+	SubType     string  `json:"sub_type"`
+	Time        float64 `json:"time"`
+	UserId      float64 `json:"user_id"`
 }
 
 type Sender struct {
-	Age      int     `mapstructure:"age"`
-	Nickname string  `mapstructure:"nickname"`
-	Sex      string  `mapstructure:"sex"`
-	UserId   float64 `mapstructure:"user_id"`
+	Age      int     `json:"age"`
+	Nickname string  `json:"nickname"`
+	Sex      string  `json:"sex"`
+	UserId   float64 `json:"user_id"`
 }
 
 type PrivateMsgEvent interface {
 	do(msg PrivateMsg)
 }
 
-type callPrivateMsgEvent func(PrivateMsg)
+type callPrivateMsgEvent func(p PrivateMsg)
 
 func (pe callPrivateMsgEvent) do(p PrivateMsg) {
 	pe(p)
+	logrus.WithFields(map[string]interface{}{
+		"input":  p,
+		"method": runtime.FuncForPC(reflect.ValueOf(pe).Pointer()).Name(),
+	}).Info("success")
 }
 
 // 提供外部调用
 func (qqEvent *QQEvent) OnPrivateMsgEvent(param map[string]interface{}, regex string, f func(PrivateMsg)) {
 	if qqEvent.privateMsg == nil {
 		qqEvent.privateMsg = new(PrivateMsg)
-		err := mapstructure.Decode(param, qqEvent.privateMsg)
+		//err := mapstructure.Decode(param, qqEvent.privateMsg)
+		paramJson, _ := json.Marshal(param)
+		err := json.NewDecoder(strings.NewReader(string(paramJson))).Decode(qqEvent.privateMsg)
 		if err != nil {
-			log.Println(err)
+			logrus.Warn(err)
 		}
 	}
 	if ok, _ := regexp.Match(regex, []byte(qqEvent.privateMsg.Message)); ok {

@@ -1,12 +1,16 @@
 package main
 
 import (
+	"os"
+	"os/signal"
+	"time"
+
+	"github.com/sirupsen/logrus"
+	"github.com/urfave/cli"
+
 	"github.com/denyu95/life/cmd"
 	"github.com/denyu95/life/pkg/db"
 	"github.com/denyu95/life/pkg/log"
-	"github.com/urfave/cli"
-	"os"
-	"os/signal"
 )
 
 const Version = "1.0"
@@ -16,20 +20,24 @@ type Param struct {
 	B string `json:"b"`
 }
 
+func init() {
+	log.Init("", time.Minute, time.Minute*5)
+}
+
 func main() {
 	c := make(chan os.Signal)
 	signal.Notify(c)
 	defer func() {
-		log.Info("...关闭数据库连接...")
+		logrus.Info("...关闭数据库连接...")
 		db.GetDB().Close()
-		log.Info("...结束...")
+		logrus.Info("...结束...")
 	}()
 
-	log.WithField("key", "value").Info("...开始...")
+	logrus.Info("...开始...")
 
 	go do()
 	<-c
-	log.Warn("...外部强制停止...")
+	logrus.Warn("...外部强制停止...")
 }
 
 func do() {

@@ -15,11 +15,6 @@ import (
 
 const Version = "1.0"
 
-type Param struct {
-	A string `json:"a"`
-	B string `json:"b"`
-}
-
 func init() {
 	log.Init("", time.Minute, time.Minute*5)
 }

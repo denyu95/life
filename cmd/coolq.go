@@ -8,7 +8,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
 
-	"github.com/denyu95/life/pkg/convert"
+	"github.com/denyu95/life/pkg/convertor"
 	"github.com/denyu95/life/routes"
 )
 
@@ -35,10 +35,10 @@ func coolqEvent(w http.ResponseWriter, r *http.Request) {
 	m := map[string]interface{}{}
 	json.Unmarshal(buf, &m)
 
-	strPostType, _ := convert.ToString(m["post_type"])
-	strMsgType, _ := convert.ToString(m["message_type"])
-	strEventType, _ := convert.ToString(m["event"])
-	strReqType, _ := convert.ToString(m["request_type"])
+	strPostType := convertor.ToString(m["post_type"])
+	strMsgType := convertor.ToString(m["message_type"])
+	strEventType := convertor.ToString(m["event"])
+	strReqType := convertor.ToString(m["request_type"])
 
 	if strPostType == "message" {
 		msgTypeEvent(strMsgType, m)

@@ -32,6 +32,8 @@ func init() {
 	// 设置数据库连接池参数
 	_db.DB().SetMaxOpenConns(100) // 数据库连接池最大连接数
 	_db.DB().SetMaxIdleConns(20)  // 连接池空闲连接数，如果最大连接数设置小于空闲连接数，则空闲连接数等于最大连接数。
+	// 关闭调试日志
+	_db.LogMode(false)
 }
 
 func GetDB() *gorm.DB {

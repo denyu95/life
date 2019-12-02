@@ -10,7 +10,7 @@ import (
 	"github.com/rifflock/lfshook"
 	"github.com/sirupsen/logrus"
 
-	"github.com/denyu95/life/pkg/convert"
+	"github.com/denyu95/life/pkg/convertor"
 )
 
 type MyFormatter struct {
@@ -18,6 +18,8 @@ type MyFormatter struct {
 	DisableTimestamp bool
 	DisableFileLine  bool
 }
+
+var MapLog = make(map[string]*logrus.Entry)
 
 // @title	Init
 // @description	日志初始化动作
@@ -79,7 +81,7 @@ func (m *MyFormatter) Format(entry *logrus.Entry) ([]byte, error) {
 	}
 
 	for k, v := range data {
-		strV, _ := convert.ToString(v)
+		strV := convertor.ToString(v)
 		output += " " + k + "[" + strV + "]"
 	}
 
@@ -89,13 +91,20 @@ func (m *MyFormatter) Format(entry *logrus.Entry) ([]byte, error) {
 }
 
 func newLfsHook(path string, rotationTime, maxAge time.Duration) logrus.Hook {
+	tail := ""
+	if rotationTime == time.Minute {
+		tail = ".%Y%m%d%H%M"
+	} else if rotationTime == time.Hour {
+		tail = ".%Y%m%d%H"
+	}
+
 	infoWriter, err := rotatelogs.New(
-		path+".%Y%m%d%H%M",
+		path + tail,
 		// WithLinkName为最新的日志建立软连接，以方便随着找到当前日志文件
 		rotatelogs.WithLinkName(path),
 
 		// WithRotationTime设置日志分割的时间，这里设置为一小时分割一次
-		rotatelogs.WithRotationTime(time.Minute),
+		rotatelogs.WithRotationTime(rotationTime),
 
 		// WithMaxAge和WithRotationCount二者只能设置一个，
 		// WithMaxAge设置文件清理前的最长保存时间，
@@ -105,12 +114,12 @@ func newLfsHook(path string, rotationTime, maxAge time.Duration) logrus.Hook {
 	)
 
 	wfWriter, err := rotatelogs.New(
-		path+".wf"+".%Y%m%d%H%M",
+		path + ".wf" + tail,
 		// WithLinkName为最新的日志建立软连接，以方便随着找到当前日志文件
 		rotatelogs.WithLinkName(path+".wf"),
 
 		// WithRotationTime设置日志分割的时间，这里设置为一小时分割一次
-		rotatelogs.WithRotationTime(time.Minute),
+		rotatelogs.WithRotationTime(rotationTime),
 
 		// WithMaxAge和WithRotationCount二者只能设置一个，
 		// WithMaxAge设置文件清理前的最长保存时间，

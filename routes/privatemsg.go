@@ -7,6 +7,5 @@ import (
 
 func HandlePrivateMsg(param map[string]interface{}) {
 	event := event.NewQQEvent()
-	event.OnPrivateMsgEvent(param, "[a-z]+", service.Demo)
-	event.OnPrivateMsgEvent(param, "[A-Z]+", service.Demo1)
+	event.OnPrivateMsgEvent(param, `^创建用户(?:,|，)([^\n]+)$`, service.CreateUser)
 }

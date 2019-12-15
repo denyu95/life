@@ -5,8 +5,8 @@ import (
 )
 
 type User struct {
-	Base
-	Id       int       `gorm:"column:id"`
+	DaoBase
+	Id       int       `gorm:"column:id;primary_key"`
 	Uid      string    `gorm:"column:uid"`
 	Name     string    `gorm:"column:name"`
 	Nickname string    `gorm:"column:nickname"`
@@ -16,4 +16,12 @@ type User struct {
 
 func (User) TableName() string {
 	return "t_user"
+}
+
+func (u *User) Add() error {
+	return u.DaoBase.Add(u)
+}
+
+func (u *User) GetRecordByConds(conds map[string]interface{}, order string) error {
+	return u.DaoBase.GetRecordByConds(u, conds, order)
 }

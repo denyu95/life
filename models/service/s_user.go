@@ -4,18 +4,19 @@ import (
 	"strings"
 	"time"
 
+	"fmt"
+
 	"github.com/denyu95/life/models/dao"
 	"github.com/denyu95/life/pkg/convertor"
 	"github.com/denyu95/life/pkg/qq/event"
-	"github.com/denyu95/life/pkg/log"
 )
 
 func CreateUser(msg event.PrivateMsg) (replyMsg string) {
-	replyMsg = "创建用户成功"
+	replyMsg = "加入成功"
 
 	timeNow := time.Now()
-	strUserId := convertor.ToString(msg.UserId)
 
+	strUserId := convertor.ToString(msg.Sender.UserId)
 	userId := strings.Split(strUserId, ".")[0]
 
 	name := ""
@@ -31,12 +32,30 @@ func CreateUser(msg event.PrivateMsg) (replyMsg string) {
 		UpdateAt: timeNow,
 	}
 
-	if err := user.Add(&user); err != nil {
-		log.MapLog[msg.LogId].Warn(err)
-		replyMsg = "创建用户失败"
+	if err := user.Add(); err != nil {
+		msg.Logger.Warn(err)
+		if strings.Contains(err.Error(), "Error 1062") {
+			replyMsg = "已加入"
+		} else {
+			replyMsg = "加入失败"
+		}
+
 		return
 	}
 
-	log.MapLog[msg.LogId].Info(replyMsg)
+	return
+}
+
+func SayHello(msg event.PrivateMsg) (replyMsg string) {
+	replyMsg = "Hello %s!"
+
+	user := dao.User{}
+	strUid := convertor.ToString(msg.Sender.UserId)
+	uid := strings.Split(strUid, ".")[0]
+	user.GetRecordByConds(map[string]interface{}{
+		"uid": uid,
+	}, "")
+
+	replyMsg = fmt.Sprintf(replyMsg, user.Name)
 	return
 }

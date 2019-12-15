@@ -5,8 +5,8 @@ import (
 )
 
 type DepositRecord struct {
-	Base
-	Id       int       `gorm:"column:id"`
+	DaoBase
+	Id       int       `gorm:"column:id;primary_key"`
 	Uid      string    `gorm:"column:uid"`
 	Money    float32   `gorm:"column:money"`
 	CreateAt time.Time `gorm:"column:createAt"`

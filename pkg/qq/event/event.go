@@ -9,9 +9,8 @@ import (
 
 	"github.com/sirupsen/logrus"
 
-	"github.com/denyu95/life/pkg/convertor"
 	"github.com/satori/go.uuid"
-	"github.com/denyu95/life/pkg/log"
+
 	"github.com/denyu95/life/pkg/qq/api"
 )
 
@@ -24,19 +23,19 @@ func NewQQEvent() *QQEvent {
 }
 
 type PrivateMsg struct {
-	LogId		string	`json:"log_id"`
-	RegxResult	[]string `json:"regx_result"`
-	Font        float64 `json:"font"`
-	Message     string  `json:"message"`
-	MessageId   int     `json:"message_id"`
-	MessageType string  `json:"message_type"`
-	PostType    string  `json:"post_type"`
-	RawMessage  string  `json:"raw_message"`
-	SelfId      float64 `json:"self_id"`
-	Sender      Sender  `json:"sender"`
-	SubType     string  `json:"sub_type"`
-	Time        float64 `json:"time"`
-	UserId      float64 `json:"user_id"`
+	RegxResult  []string `json:"regx_result"`
+	Font        float64  `json:"font"`
+	Message     string   `json:"message"`
+	MessageId   int      `json:"message_id"`
+	MessageType string   `json:"message_type"`
+	PostType    string   `json:"post_type"`
+	RawMessage  string   `json:"raw_message"`
+	SelfId      float64  `json:"self_id"`
+	Sender      Sender   `json:"sender"`
+	SubType     string   `json:"sub_type"`
+	Time        float64  `json:"time"`
+	UserId      float64  `json:"user_id"`
+	Logger		*logrus.Entry `json:"-"`
 }
 
 type Sender struct {
@@ -54,22 +53,27 @@ type callPrivateMsgEvent func(msg PrivateMsg) string
 
 func (callEvent callPrivateMsgEvent) do(privateMsg PrivateMsg) {
 	uuid, _ := uuid.NewV4()
-	logId := strings.ReplaceAll(uuid.String(),"-","")
-	privateMsg.LogId = logId
+	logId := strings.ReplaceAll(uuid.String(), "-", "")
 
-	entry := logrus.WithFields(map[string]interface{}{
-		"input":  convertor.ToString(privateMsg),
-		"method": runtime.FuncForPC(reflect.ValueOf(callEvent).Pointer()).Name(),
+	buff, _ := json.Marshal(privateMsg)
+	strInput := string(buff)
+	methodName := runtime.FuncForPC(reflect.ValueOf(callEvent).Pointer()).Name()
+	requestLogger := logrus.WithFields(logrus.Fields{
+		"logId" : logId,
+		"input" : strInput,
+		"method" : methodName,
 	})
+	privateMsg.Logger = requestLogger
 
-	log.MapLog[logId] = entry
+	strOutput := callEvent(privateMsg)
 
 	api.SendPrivateMsg(map[string]interface{}{
 		"user_id": privateMsg.Sender.UserId,
-		"message": callEvent(privateMsg),
+		"message": strOutput,
 	})
 
-	delete(log.MapLog, logId)
+	requestLogger.WithField("output", strOutput)
+	requestLogger.Info("success")
 }
 
 // 提供外部调用

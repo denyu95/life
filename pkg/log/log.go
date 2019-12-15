@@ -19,8 +19,6 @@ type MyFormatter struct {
 	DisableFileLine  bool
 }
 
-var MapLog = make(map[string]*logrus.Entry)
-
 // @title	Init
 // @description	日志初始化动作
 // @param	path			string	"需要传文件的绝对路径"
@@ -99,7 +97,7 @@ func newLfsHook(path string, rotationTime, maxAge time.Duration) logrus.Hook {
 	}
 
 	infoWriter, err := rotatelogs.New(
-		path + tail,
+		path+tail,
 		// WithLinkName为最新的日志建立软连接，以方便随着找到当前日志文件
 		rotatelogs.WithLinkName(path),
 
@@ -114,7 +112,7 @@ func newLfsHook(path string, rotationTime, maxAge time.Duration) logrus.Hook {
 	)
 
 	wfWriter, err := rotatelogs.New(
-		path + ".wf" + tail,
+		path+".wf"+tail,
 		// WithLinkName为最新的日志建立软连接，以方便随着找到当前日志文件
 		rotatelogs.WithLinkName(path+".wf"),
 

@@ -1,4 +1,4 @@
-// 保证金
+// 充值记录表
 package dao
 
 import (
@@ -16,4 +16,12 @@ type DepositRecord struct {
 
 func (DepositRecord) TableName() string {
 	return "t_deposit_record"
+}
+
+func (u *DepositRecord) Add() error {
+	return u.DaoBase.Add(u)
+}
+
+func (u *DepositRecord) GetRecordByConds(conds map[string]interface{}, order string) error {
+	return u.DaoBase.GetRecordByConds(u, conds, order)
 }

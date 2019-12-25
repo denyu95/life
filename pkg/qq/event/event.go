@@ -7,10 +7,12 @@ import (
 	"runtime"
 	"strings"
 
+	uuid "github.com/satori/go.uuid"
 	"github.com/sirupsen/logrus"
 
-	"github.com/satori/go.uuid"
+	"time"
 
+	"github.com/denyu95/life/pkg/convertor"
 	"github.com/denyu95/life/pkg/qq/api"
 )
 
@@ -36,6 +38,8 @@ type PrivateMsg struct {
 	Time        float64       `json:"time"`
 	UserId      float64       `json:"user_id"`
 	Logger      *logrus.Entry `json:"-"`
+	Uid         string        `json:"-"`
+	TimeNow     time.Time     `json:"-"`
 }
 
 type Sender struct {
@@ -85,6 +89,10 @@ func (qqEvent *QQEvent) OnPrivateMsgEvent(param map[string]interface{}, strRegex
 		if err != nil {
 			logrus.Warn(err)
 		}
+		// 统一处理uid
+		qqEvent.privateMsg.Uid = convertor.ToString(qqEvent.privateMsg.Sender.UserId)
+		// 统一加入当前时间
+		qqEvent.privateMsg.TimeNow = time.Now()
 	}
 	if ok, _ := regexp.Match(strRegex, []byte(qqEvent.privateMsg.Message)); ok {
 		regex := regexp.MustCompile(strRegex)

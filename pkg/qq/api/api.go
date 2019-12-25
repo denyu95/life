@@ -7,7 +7,7 @@ import (
 
 var qqApi http.Api
 
-func init() {
+func Init() {
 	qqApi = http.NewApi(setting.Api.QQBaseUrl)
 }
 

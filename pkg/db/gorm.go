@@ -7,13 +7,12 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	"github.com/sirupsen/logrus"
 
-	_ "github.com/denyu95/life/pkg/log"
 	"github.com/denyu95/life/pkg/setting"
 )
 
 var _db *gorm.DB
 
-func init() {
+func Init() {
 	username := setting.MySql.Username //账号
 	password := setting.MySql.Password //密码
 	host := setting.MySql.Host         //数据库地址，可以是Ip或者域名
@@ -26,8 +25,7 @@ func init() {
 	var err error
 	_db, err = gorm.Open("mysql", dsn)
 	if err != nil {
-		logrus.Warn(err)
-		panic(err)
+		logrus.Fatal(err)
 	}
 	// 设置数据库连接池参数
 	_db.DB().SetMaxOpenConns(100) // 数据库连接池最大连接数

@@ -18,9 +18,12 @@ var (
 		DBName   string
 		Timeout  string
 	}
+	Log struct {
+		Path string
+	}
 )
 
-func init() {
+func Init() {
 	ini, err := ini.NewIni("conf/app.ini")
 	if err != nil {
 		logrus.Warn(err)
@@ -35,4 +38,7 @@ func init() {
 	MySql.Port, _ = ini.Int("mysql", "port")
 	MySql.DBName = ini.String("mysql", "db.name")
 	MySql.Timeout = ini.String("mysql", "timeout")
+
+	// Log配置
+	Log.Path = ini.String("log", "path")
 }

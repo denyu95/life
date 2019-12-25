@@ -45,6 +45,12 @@ func (m *MyFormatter) Format(entry *logrus.Entry) ([]byte, error) {
 	output := ""
 
 	switch entry.Level {
+	case logrus.FatalLevel:
+		output += "FATAL: "
+		break
+	case logrus.ErrorLevel:
+		output += "ERROR: "
+		break
 	case logrus.WarnLevel:
 		output += "WARNING: "
 		break
@@ -94,6 +100,9 @@ func newLfsHook(path string, rotationTime, maxAge time.Duration) logrus.Hook {
 		tail = ".%Y%m%d%H%M"
 	} else if rotationTime == time.Hour {
 		tail = ".%Y%m%d%H"
+	} else {
+		// 默认按照小时切分日志
+		tail = ".%Y%m%d%H"
 	}
 
 	infoWriter, err := rotatelogs.New(
@@ -111,10 +120,40 @@ func newLfsHook(path string, rotationTime, maxAge time.Duration) logrus.Hook {
 		//rotatelogs.WithRotationCount(maxRemainCnt),
 	)
 
-	wfWriter, err := rotatelogs.New(
-		path+".wf"+tail,
+	warnWriter, err := rotatelogs.New(
+		path+".w"+tail,
 		// WithLinkName为最新的日志建立软连接，以方便随着找到当前日志文件
-		rotatelogs.WithLinkName(path+".wf"),
+		rotatelogs.WithLinkName(path+".w"),
+
+		// WithRotationTime设置日志分割的时间，这里设置为一小时分割一次
+		rotatelogs.WithRotationTime(rotationTime),
+
+		// WithMaxAge和WithRotationCount二者只能设置一个，
+		// WithMaxAge设置文件清理前的最长保存时间，
+		// WithRotationCount设置文件清理前最多保存的个数。
+		rotatelogs.WithMaxAge(maxAge),
+		//rotatelogs.WithRotationCount(maxRemainCnt),
+	)
+
+	errorWriter, err := rotatelogs.New(
+		path+".e"+tail,
+		// WithLinkName为最新的日志建立软连接，以方便随着找到当前日志文件
+		rotatelogs.WithLinkName(path+".e"),
+
+		// WithRotationTime设置日志分割的时间，这里设置为一小时分割一次
+		rotatelogs.WithRotationTime(rotationTime),
+
+		// WithMaxAge和WithRotationCount二者只能设置一个，
+		// WithMaxAge设置文件清理前的最长保存时间，
+		// WithRotationCount设置文件清理前最多保存的个数。
+		rotatelogs.WithMaxAge(maxAge),
+		//rotatelogs.WithRotationCount(maxRemainCnt),
+	)
+
+	fatalWriter, err := rotatelogs.New(
+		path+".f"+tail,
+		// WithLinkName为最新的日志建立软连接，以方便随着找到当前日志文件
+		rotatelogs.WithLinkName(path+".f"),
 
 		// WithRotationTime设置日志分割的时间，这里设置为一小时分割一次
 		rotatelogs.WithRotationTime(rotationTime),
@@ -132,8 +171,10 @@ func newLfsHook(path string, rotationTime, maxAge time.Duration) logrus.Hook {
 
 	logrus.SetReportCaller(true)
 	lfsHook := lfshook.NewHook(lfshook.WriterMap{
-		logrus.InfoLevel: infoWriter,
-		logrus.WarnLevel: wfWriter,
+		logrus.InfoLevel:  infoWriter,
+		logrus.WarnLevel:  warnWriter,
+		logrus.ErrorLevel: errorWriter,
+		logrus.FatalLevel: fatalWriter,
 	}, &MyFormatter{})
 
 	return lfsHook

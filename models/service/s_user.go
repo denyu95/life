@@ -1,61 +1,67 @@
 package service
 
 import (
-	"strings"
-	"time"
-
 	"fmt"
+	"strings"
 
+	"github.com/denyu95/life/conf"
 	"github.com/denyu95/life/models/dao"
-	"github.com/denyu95/life/pkg/convertor"
 	"github.com/denyu95/life/pkg/qq/event"
 )
 
-func CreateUser(msg event.PrivateMsg) (replyMsg string) {
-	replyMsg = "加入成功"
+func SaveUser(msg event.PrivateMsg) (replyMsg string) {
 
-	timeNow := time.Now()
-
-	strUserId := convertor.ToString(msg.Sender.UserId)
-	userId := strings.Split(strUserId, ".")[0]
+	replyMsg = conf.JoinSuccess
 
 	name := ""
-	if len(msg.RegxResult) > 1 {
+	if len(msg.RegxResult) == 2 {
 		name = msg.RegxResult[1]
+	} else {
+		msg.Logger.Error(conf.RegexError)
+		replyMsg = conf.JoinFailed
+		return
+	}
+
+	sex := 1
+	if msg.Sender.Sex != "male" {
+		sex = 0
 	}
 
 	user := dao.User{
-		Uid:      userId,
+		Uid:      msg.Uid,
 		Name:     name,
 		Nickname: msg.Sender.Nickname,
-		CreateAt: timeNow,
-		UpdateAt: timeNow,
+		Sex:      sex,
+		CreateAt: msg.TimeNow,
+		UpdateAt: msg.TimeNow,
 	}
 
 	if err := user.Add(); err != nil {
-		msg.Logger.Warn(err)
 		if strings.Contains(err.Error(), "Error 1062") {
-			replyMsg = "已加入"
+			msg.Logger.Warn(err)
+			replyMsg = conf.NoNeedToJoin
 		} else {
-			replyMsg = "加入失败"
+			msg.Logger.Error(err)
+			replyMsg = conf.JoinFailed
 		}
-
-		return
 	}
 
 	return
 }
 
 func SayHello(msg event.PrivateMsg) (replyMsg string) {
-	replyMsg = "Hello %s!"
+	replyMsg = "%s%s，你好(⁎⁍̴̛ᴗ⁍̴̛⁎)"
 
 	user := dao.User{}
-	strUid := convertor.ToString(msg.Sender.UserId)
-	uid := strings.Split(strUid, ".")[0]
+
 	user.GetRecordByConds(map[string]interface{}{
-		"uid": uid,
+		"uid": msg.Uid,
 	}, "")
 
-	replyMsg = fmt.Sprintf(replyMsg, user.Name)
+	sex := "小哥哥"
+	if user.Sex == 0 {
+		sex = "小姐姐"
+	}
+	replyMsg = fmt.Sprintf(replyMsg, user.Name, sex)
 	return
 }

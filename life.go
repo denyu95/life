@@ -11,14 +11,26 @@ import (
 	"github.com/denyu95/life/cmd"
 	"github.com/denyu95/life/pkg/db"
 	"github.com/denyu95/life/pkg/log"
+	qqApi "github.com/denyu95/life/pkg/qq/api"
+	"github.com/denyu95/life/pkg/setting"
 )
 
 const Version = "1.0"
 
+// 工程初始化，初始化顺序不要改变
 func init() {
-	log.Init("", time.Minute, time.Minute*5)
+	setting.Init()
+	log.Init(setting.Log.Path, time.Minute, time.Minute*5)
+	db.Init()
+	qqApi.Init()
 }
 
+// 1 ） 获取单个对象的方法用 get 做前缀。
+// 2 ） 获取多个对象的方法用 list 做前缀。
+// 3 ） 获取统计值的方法用 count 做前缀。
+// 4 ） 插入的方法用 save（ 推荐 ） 或 insert 做前缀。
+// 5 ） 删除的方法用 remove（ 推荐 ） 或 delete 做前缀。
+// 6 ） 修改的方法用 update 做前缀。
 func main() {
 	c := make(chan os.Signal)
 	signal.Notify(c)

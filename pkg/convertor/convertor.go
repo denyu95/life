@@ -2,13 +2,9 @@ package convertor
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
-	"reflect"
 	"strconv"
 	"time"
-
-	"github.com/sirupsen/logrus"
 )
 
 func ToString(v interface{}) string {
@@ -18,13 +14,13 @@ func ToString(v interface{}) string {
 	case int:
 		return strconv.Itoa(v.(int))
 	case int32:
-		return strconv.FormatInt(v.(int64), 10)
+		return strconv.FormatInt(int64(v.(int32)), 10)
 	case int64:
 		return strconv.FormatInt(v.(int64), 10)
 	case float32:
-		return strconv.FormatFloat(v.(float64), 'f', 5, 32)
+		return strconv.FormatFloat(float64(v.(float32)), 'f', -1, 32)
 	case float64:
-		return strconv.FormatFloat(v.(float64), 'f', 5, 64)
+		return strconv.FormatFloat(v.(float64), 'f', -1, 64)
 	case bool:
 		return strconv.FormatBool(v.(bool))
 	case time.Time:
@@ -44,37 +40,27 @@ func ToString(v interface{}) string {
 }
 
 func ToInt(v interface{}) (int, error) {
-	switch v.(type) {
-	case int:
-		strV := ToString(v)
-		return strconv.Atoi(strV)
-	default:
-		errText := fmt.Sprintf("%v类型无法使用ToInt转化", reflect.TypeOf(v))
-		logrus.Warnf(errText)
-		return 0, errors.New(errText)
-	}
+	strV := ToString(v)
+	return strconv.Atoi(strV)
 }
 
 func ToInt64(v interface{}) (int64, error) {
-	switch v.(type) {
-	case int64:
-		strV := ToString(v)
-		return strconv.ParseInt(strV, 10, 64)
-	default:
-		errText := fmt.Sprintf("%v类型无法使用ToInt64转化", reflect.TypeOf(v))
-		logrus.Warnf(errText)
-		return 0, errors.New(errText)
-	}
+	strV := ToString(v)
+	return strconv.ParseInt(strV, 10, 64)
 }
 
 func ToBool(v interface{}) (bool, error) {
-	switch v.(type) {
-	case int64:
-		strV := ToString(v)
-		return strconv.ParseBool(strV)
-	default:
-		errText := fmt.Sprintf("%v类型无法使用ToInt64转化", reflect.TypeOf(v))
-		logrus.Warnf(errText)
-		return false, errors.New(errText)
-	}
+	strV := ToString(v)
+	return strconv.ParseBool(strV)
+}
+
+func ToFloat32(v interface{}) (float32, error) {
+	strV := ToString(v)
+	v64, err := strconv.ParseFloat(strV, 32)
+	return float32(v64), err
+}
+
+func ToFloat64(v interface{}) (float64, error) {
+	strV := ToString(v)
+	return strconv.ParseFloat(strV, 64)
 }

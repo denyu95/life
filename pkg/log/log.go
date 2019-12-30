@@ -36,7 +36,8 @@ func Init(outPath string, rotationTime, maxAge time.Duration) {
 		logrus.SetOutput(writer)
 	} else {
 		logrus.SetReportCaller(true)
-		logrus.SetFormatter(&MyFormatter{})
+		//logrus.SetFormatter(&MyFormatter{})
+		logrus.SetFormatter(&logrus.TextFormatter{})
 	}
 }
 
@@ -175,7 +176,8 @@ func newLfsHook(path string, rotationTime, maxAge time.Duration) logrus.Hook {
 		logrus.WarnLevel:  warnWriter,
 		logrus.ErrorLevel: errorWriter,
 		logrus.FatalLevel: fatalWriter,
-	}, &MyFormatter{})
+	//}, &MyFormatter{})
+	}, &logrus.TextFormatter{})
 
 	return lfsHook
 }

@@ -12,4 +12,8 @@ const (
 	// 充值
 	DepositSuccess = "充值成功 ٩(˃̶͈̀௰˂̶͈́)و"
 	DepositFailed  = "充值失败 (;´༎ຶД༎ຶ`)"
+
+	// 消费
+	SpendSuccess = "消费成功 ٩(˃̶͈̀௰˂̶͈́)و"
+	SpendFailed = "消费失败 (;´༎ຶД༎ຶ`)"
 )

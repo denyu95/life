@@ -11,6 +11,8 @@ func HandlePrivateMsg(param map[string]interface{}) {
 	event.OnPrivateMsgEvent(param, `^hello$`, service.SayHello)
 
 	event.OnPrivateMsgEvent(param, `^充值(?:,|，)(-?\d+\.?\d{0,2})$`, service.SaveDepositRecord)
+
+	event.OnPrivateMsgEvent(param, `^(?:！|!)([^\n]+)(?:,|，)(\d+\.?\d{0,2})$`, service.SaveSpendRecord)
 }
 
 func HandleGroupMsg(param map[string]interface{}) {
@@ -19,4 +21,6 @@ func HandleGroupMsg(param map[string]interface{}) {
 	event.OnGroupMsgEvent(param, `^hello$`, service.SayHello)
 
 	event.OnGroupMsgEvent(param, `^充值(?:,|，)(-?\d+\.?\d{0,2})$`, service.SaveDepositRecord)
+
+	event.OnGroupMsgEvent(param, `^^(?:！|!)([^\n]+)(?:,|，)(\d+\.?\d{0,2})$`, service.SaveSpendRecord)
 }

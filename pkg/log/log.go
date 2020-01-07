@@ -21,10 +21,12 @@ type MyFormatter struct {
 
 // @title	Init
 // @description	日志初始化动作
-// @param	path			string	"需要传文件的绝对路径"
-// @param	rotationTime	time	"日志分割时间"
-// @param	maxAge			time	"日志保留时间"
-func Init(outPath string, rotationTime, maxAge time.Duration) {
+// @param	path			string			"需要传文件的绝对路径"
+// @param	rotationTime	time			"日志分割时间"
+// @param	maxAge			time			"日志保留时间"
+// @param	level			logrus.Level	"日志开启等级"
+func Init(outPath string, rotationTime, maxAge time.Duration, level logrus.Level) {
+	logrus.SetLevel(level)
 	if outPath != "" {
 		logrus.AddHook(newLfsHook(outPath, rotationTime, maxAge))
 		// 控制台不输出
@@ -37,7 +39,7 @@ func Init(outPath string, rotationTime, maxAge time.Duration) {
 	} else {
 		logrus.SetReportCaller(true)
 		//logrus.SetFormatter(&MyFormatter{})
-		logrus.SetFormatter(&logrus.TextFormatter{})
+		logrus.SetFormatter(&logrus.TextFormatter{TimestampFormat: "2006-01-02 15:04:05"})
 	}
 }
 
@@ -58,6 +60,8 @@ func (m *MyFormatter) Format(entry *logrus.Entry) ([]byte, error) {
 	case logrus.InfoLevel:
 		output += "NOTICE: "
 		break
+	case logrus.DebugLevel:
+		output += "DEBUG: "
 	}
 
 	// 是否打印时间
@@ -121,6 +125,21 @@ func newLfsHook(path string, rotationTime, maxAge time.Duration) logrus.Hook {
 		//rotatelogs.WithRotationCount(maxRemainCnt),
 	)
 
+	debugWriter, err := rotatelogs.New(
+		path+".d"+tail,
+		// WithLinkName为最新的日志建立软连接，以方便随着找到当前日志文件
+		rotatelogs.WithLinkName(path+".d"),
+
+		// WithRotationTime设置日志分割的时间，这里设置为一小时分割一次
+		rotatelogs.WithRotationTime(rotationTime),
+
+		// WithMaxAge和WithRotationCount二者只能设置一个，
+		// WithMaxAge设置文件清理前的最长保存时间，
+		// WithRotationCount设置文件清理前最多保存的个数。
+		rotatelogs.WithMaxAge(maxAge),
+		//rotatelogs.WithRotationCount(maxRemainCnt),
+	)
+
 	warnWriter, err := rotatelogs.New(
 		path+".w"+tail,
 		// WithLinkName为最新的日志建立软连接，以方便随着找到当前日志文件
@@ -172,12 +191,13 @@ func newLfsHook(path string, rotationTime, maxAge time.Duration) logrus.Hook {
 
 	logrus.SetReportCaller(true)
 	lfsHook := lfshook.NewHook(lfshook.WriterMap{
+		logrus.DebugLevel: debugWriter,
 		logrus.InfoLevel:  infoWriter,
 		logrus.WarnLevel:  warnWriter,
 		logrus.ErrorLevel: errorWriter,
 		logrus.FatalLevel: fatalWriter,
 	//}, &MyFormatter{})
-	}, &logrus.TextFormatter{})
+	}, &logrus.TextFormatter{TimestampFormat: "2006-01-02 15:04:05"})
 
 	return lfsHook
 }

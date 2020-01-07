@@ -6,42 +6,49 @@ import (
 
 	"github.com/denyu95/life/conf"
 	"github.com/denyu95/life/models/dao"
+	"github.com/denyu95/life/pkg/convertor"
+	"github.com/denyu95/life/pkg/qq/api"
 	"github.com/denyu95/life/pkg/qq/event"
 )
 
-func SaveUser(msg event.PrivateMsg) (replyMsg string) {
+// 保存用户
+func SaveUser(p *event.ReqParam) (replyMsg string) {
 
 	replyMsg = conf.JoinSuccess
 
 	name := ""
-	if len(msg.RegxResult) == 2 {
-		name = msg.RegxResult[1]
+	if len(p.RegexResult) == 2 {
+		name = p.RegexResult[1]
 	} else {
-		msg.Logger.Error(conf.RegexError)
+		p.Logger.Error(conf.RegexError)
 		replyMsg = conf.JoinFailed
 		return
 	}
 
 	sex := 1
-	if msg.Sender.Sex != "male" {
+	if p.Sex == "unknown" {
+		userInfo := api.GetStrangerInfo(map[string]interface{}{"user_id": p.Uid})
+		p.Sex = convertor.ToString(userInfo["sex"])
+	}
+	if p.Sex != "male" {
 		sex = 0
 	}
 
 	user := dao.User{
-		Uid:      msg.Uid,
+		Uid:      p.Uid,
 		Name:     name,
-		Nickname: msg.Sender.Nickname,
+		Nickname: p.Nickname,
 		Sex:      sex,
-		CreateAt: msg.TimeNow,
-		UpdateAt: msg.TimeNow,
+		CreateAt: p.TimeNow,
+		UpdateAt: p.TimeNow,
 	}
 
 	if err := user.Add(); err != nil {
 		if strings.Contains(err.Error(), "Error 1062") {
-			msg.Logger.Warn(err)
+			p.Logger.Warn(err)
 			replyMsg = conf.NoNeedToJoin
 		} else {
-			msg.Logger.Error(err)
+			p.Logger.Error(err)
 			replyMsg = conf.JoinFailed
 		}
 	}
@@ -49,13 +56,14 @@ func SaveUser(msg event.PrivateMsg) (replyMsg string) {
 	return
 }
 
-func SayHello(msg event.PrivateMsg) (replyMsg string) {
+// 打招呼
+func SayHello(p *event.ReqParam) (replyMsg string) {
 	replyMsg = "%s%s，你好(⁎⁍̴̛ᴗ⁍̴̛⁎)"
 
 	user := dao.User{}
 
 	user.GetRecordByConds(map[string]interface{}{
-		"uid": msg.Uid,
+		"uid": p.Uid,
 	}, "")
 
 	sex := "小哥哥"

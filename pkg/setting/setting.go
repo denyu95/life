@@ -20,6 +20,7 @@ var (
 	}
 	Log struct {
 		Path string
+		Level string
 	}
 )
 
@@ -41,4 +42,5 @@ func Init() {
 
 	// Log配置
 	Log.Path = ini.String("log", "path")
+	Log.Level = ini.String("log", "level")
 }

@@ -7,34 +7,35 @@ import (
 	"github.com/denyu95/life/pkg/qq/event"
 )
 
-func SaveDepositRecord(msg event.PrivateMsg) (replyMsg string) {
+// 保存充值记录
+func SaveDepositRecord(p *event.ReqParam) (replyMsg string) {
 
 	replyMsg = conf.DepositSuccess
 
 	var money float32
-	if len(msg.RegxResult) == 2 {
+	if len(p.RegexResult) == 2 {
 		var err error
-		money, err = convertor.ToFloat32(msg.RegxResult[1])
+		money, err = convertor.ToFloat32(p.RegexResult[1])
 		if err != nil {
-			msg.Logger.Error(err)
+			p.Logger.Error(err)
 			replyMsg = conf.DepositFailed
 			return
 		}
 	} else {
-		msg.Logger.Error(conf.RegexError)
+		p.Logger.Error(conf.RegexError)
 		replyMsg = conf.DepositFailed
 		return
 	}
 
 	depositRecord := dao.DepositRecord{
-		Uid:      msg.Uid,
+		Uid:      p.Uid,
 		Money:    money,
-		CreateAt: msg.TimeNow,
-		UpdateAt: msg.TimeNow,
+		CreateAt: p.TimeNow,
+		UpdateAt: p.TimeNow,
 	}
 
 	if err := depositRecord.Add(); err != nil {
-		msg.Logger.Error(err)
+		p.Logger.Error(err)
 		replyMsg = conf.DepositFailed
 	}
 

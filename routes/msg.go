@@ -12,3 +12,11 @@ func HandlePrivateMsg(param map[string]interface{}) {
 
 	event.OnPrivateMsgEvent(param, `^充值(?:,|，)(-?\d+\.?\d{0,2})$`, service.SaveDepositRecord)
 }
+
+func HandleGroupMsg(param map[string]interface{}) {
+	event := event.NewQQEvent()
+	event.OnGroupMsgEvent(param, `^加入(?:,|，)([^\n]+)$`, service.SaveUser)
+	event.OnGroupMsgEvent(param, `^hello$`, service.SayHello)
+
+	event.OnGroupMsgEvent(param, `^充值(?:,|，)(-?\d+\.?\d{0,2})$`, service.SaveDepositRecord)
+}

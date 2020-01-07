@@ -20,7 +20,12 @@ const Version = "1.0"
 // 工程初始化，初始化顺序不要改变
 func init() {
 	setting.Init()
-	log.Init(setting.Log.Path, time.Hour, time.Hour*24*7)
+
+	logLevel := logrus.InfoLevel
+	if setting.Log.Level == "debug" {
+		logLevel = logrus.DebugLevel
+	}
+	log.Init(setting.Log.Path, time.Hour, time.Hour*24*7, logLevel)
 	db.Init()
 	qqApi.Init()
 }

@@ -34,6 +34,7 @@ func coolqEvent(w http.ResponseWriter, r *http.Request) {
 	buf, _ := ioutil.ReadAll(r.Body)
 	m := map[string]interface{}{}
 	json.Unmarshal(buf, &m)
+	logrus.Debug(m)
 
 	strPostType := convertor.ToString(m["post_type"])
 	strMsgType := convertor.ToString(m["message_type"])
@@ -55,7 +56,8 @@ func msgTypeEvent(msgType string, param map[string]interface{}) {
 	if msgType == "private" {
 		routes.HandlePrivateMsg(param)
 	} else if msgType == "group" {
-		logrus.Info("group")
+		//logrus.Info("group")
+		routes.HandleGroupMsg(param)
 	} else if msgType == "discuss" {
 		logrus.Info("discuss")
 	} else {

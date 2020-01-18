@@ -26,3 +26,9 @@ func (u *SpendRecord) Add() error {
 func (u *SpendRecord) GetRecordByConds(conds map[string]interface{}, order string) error {
 	return u.DaoBase.GetRecordByConds(u, conds, order)
 }
+
+func (u *SpendRecord) GetRecordsByConds(conds map[string]map[string]interface{}, order string) ([]SpendRecord, error) {
+	spendRecords := make([]SpendRecord, 0)
+	err := u.DaoBase.GetRecordsByConds(&spendRecords, conds, order)
+	return spendRecords, err
+}

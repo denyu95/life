@@ -4,7 +4,7 @@ const (
 	// 正则
 	RegexError = "请检查下正则是否错误"
 
-	// 加入
+	// 用户
 	JoinSuccess  = "加入成功 ٩(˃̶͈̀௰˂̶͈́)و"
 	JoinFailed   = "加入失败 (;´༎ຶД༎ຶ`)"
 	NoNeedToJoin = "您已加入，无需再次加入 o(╯□╰)o"
@@ -14,6 +14,8 @@ const (
 	DepositFailed  = "充值失败 (;´༎ຶД༎ຶ`)"
 
 	// 消费
-	SpendSuccess = "消费成功 ٩(˃̶͈̀௰˂̶͈́)و"
-	SpendFailed = "消费失败 (;´༎ຶД༎ຶ`)"
+	SpendSuccess           = "消费成功 ٩(˃̶͈̀௰˂̶͈́)و"
+	SpendFailed            = "消费失败 (;´༎ຶД༎ຶ`)"
+	GetSpendRecordsFailed  = "查询消费记录异常，请联系管理员 (;´༎ຶД༎ຶ`)"
+	GetSpendRecordsSuccess = "%s消费记录如下：\n%s"
 )

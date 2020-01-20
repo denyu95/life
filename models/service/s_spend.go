@@ -69,6 +69,70 @@ func ListSomeTimeSpendRecord(p *event.ReqParam) (replyMsg string) {
 		// 查询月份区间
 	} else if startDate != "" {
 		// 查询指定月份
+		firstOfMonth, _ := time.Parse("2006-01-02 15:04:05", startDate + "-01 00:00:00")
+		lastOfMonth := firstOfMonth.AddDate(0, 1, -1)
+
+		strFirstOfMonth := firstOfMonth.Format("2006-01-02") + " 00:00:00"
+		strLastOfMonth := lastOfMonth.Format("2006-01-02") + " 23:59:59"
+		spendRecords, _ = spendRecord.GetRecordsByConds(map[string]map[string]interface{}{
+			"createAt": {">=" : strFirstOfMonth, "<=" : strLastOfMonth},
+		}, "uid ASC, createAt ASC")
+
+		outStr := "—————————————\n"
+		out := make(map[string][]dao.SpendRecord, 0)
+		for _, spendRecord := range spendRecords {
+			v, ok := out[spendRecord.Uid]
+			if !ok {
+				xx := make([]dao.SpendRecord, 0)
+				xx = append(xx, spendRecord)
+				out[spendRecord.Uid] = xx
+			} else {
+				v = append(v, spendRecord)
+				out[spendRecord.Uid] = v
+			}
+		}
+
+		var allTotalMoney float32
+		for k, v := range out {
+			user := dao.User{}
+
+			user.GetRecordByConds(map[string]interface{}{
+				"uid": k,
+			}, "")
+			outStr += user.Name + "\n"
+			var totalMoney float32
+			for _, vv := range v {
+				outStr += vv.CreateAt.Format("06-01-02") + " "
+				vMoney := strconv.FormatFloat(float64(vv.Money), 'f', 2, 32)
+
+				o := ""
+				st := []rune(vv.Remark)
+				for i, v := range st {
+					if i == 4 && len(st) > 5 {
+						o += "…"
+						break
+					}
+					o += string(v)
+				}
+				if len(st) < 5 {
+					l := 5 - len(st)
+					for i := 0; i < l; i++ {
+						o += "　"
+					}
+				}
+				vv.Remark = o
+
+				outStr += vv.Remark + " " + vMoney + "\n"
+				totalMoney += vv.Money
+			}
+			allTotalMoney += totalMoney
+			outStr += "　　　　　　　总计：" + strconv.FormatFloat(float64(totalMoney), 'f', 2, 32) + "\n"
+			outStr += "—————————————\n"
+		}
+
+		outStr += "　　　　　全员总计：" + strconv.FormatFloat(float64(allTotalMoney), 'f', 2, 32)
+
+		replyMsg = fmt.Sprintf(replyMsg, "< " + startDate + " > ", outStr)
 	} else {
 		// 查询本月
 		now := time.Now()
@@ -110,14 +174,23 @@ func ListSomeTimeSpendRecord(p *event.ReqParam) (replyMsg string) {
 			for _, vv := range v {
 				outStr += vv.CreateAt.Format("06-01-02") + " "
 				vMoney := strconv.FormatFloat(float64(vv.Money), 'f', 2, 32)
-				ll := len(vv.Remark)
-				if ll <= 15 {
-					for i := 3; i <= 15 - ll; i += 3 {
-						vv.Remark += "　"
+
+				o := ""
+				st := []rune(vv.Remark)
+				for i, v := range st {
+					if i == 4 && len(st) > 5 {
+						o += "…"
+						break
 					}
-				} else {
-					vv.Remark = vv.Remark[0: 12] + "…"
+					o += string(v)
 				}
+				if len(st) < 5 {
+					l := 5 - len(st)
+					for i := 0; i < l; i++ {
+						o += "　"
+					}
+				}
+				vv.Remark = o
 
 				outStr += vv.Remark + " " + vMoney + "\n"
 				totalMoney += vv.Money

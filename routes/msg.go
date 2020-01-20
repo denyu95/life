@@ -27,5 +27,9 @@ func HandleGroupMsg(param map[string]interface{}) {
 
 	event.OnGroupMsgEvent(param, `^充值(?:,|，)(-?\d+\.?\d{0,2})$`, service.SaveDepositRecord)
 
-	event.OnGroupMsgEvent(param, `^^(?:！|!)([^\n]+)(?:,|，)(\d+\.?\d{0,2})$`, service.SaveSpendRecord)
+	// 记录日常消费《！消费备注，消费金额保留两位小数》
+	event.OnGroupMsgEvent(param, `^(?:！|!)([^\n]+)(?:,|，)(\d+\.?\d{0,2})$`, service.SaveSpendRecord)
+
+	// 查看消费清单（不填日期默认查询本月消费）《清单》《清单，2020-01》《清单，2020-01，2020-02》
+	event.OnGroupMsgEvent(param, `^清单(?:(?:,|，)(\d{4}-\d{2}))?(?:(?:,|，)(\d{4}-\d{2}))?$`, service.ListSomeTimeSpendRecord)
 }

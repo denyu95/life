@@ -25,7 +25,7 @@ func Init() {
 	var err error
 	_db, err = gorm.Open("mysql", dsn)
 	if err != nil {
-		logrus.Fatal(err)
+		logrus.Error(err)
 	}
 	// 设置数据库连接池参数
 	_db.DB().SetMaxOpenConns(100) // 数据库连接池最大连接数

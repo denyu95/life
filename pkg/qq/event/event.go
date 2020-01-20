@@ -94,7 +94,7 @@ type MsgEvent interface {
 type callMsgEvent func(*ReqParam) string
 
 func (callEvent callMsgEvent) do(reqParam *ReqParam) string {
-	uuid, _ := uuid.NewV4()
+	uuid := uuid.NewV4()
 	logId := strings.ReplaceAll(uuid.String(), "-", "")
 
 	strInput := convertor.ToString(reqParam)

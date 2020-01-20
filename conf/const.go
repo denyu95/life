@@ -17,5 +17,5 @@ const (
 	SpendSuccess           = "消费成功 ٩(˃̶͈̀௰˂̶͈́)و"
 	SpendFailed            = "消费失败 (;´༎ຶД༎ຶ`)"
 	GetSpendRecordsFailed  = "查询消费记录异常，请联系管理员 (;´༎ຶД༎ຶ`)"
-	GetSpendRecordsSuccess = "%s消费记录如下：\n%s"
+	GetSpendRecordsSuccess = "%s清单如下：\n%s"
 )

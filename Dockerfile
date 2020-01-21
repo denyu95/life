@@ -6,7 +6,7 @@ MAINTAINER DENYU "extrnight@126.com"
 WORKDIR /root/go/src/github.com/denyu95/life
 #将服务器的go工程代码加入到docker容器中
 ADD . /root/go/src/github.com/denyu95/life
-#go运行环境
+#安装go运行环境
 RUN yum install -y go
 #go构建可执行文件
 RUN go build .

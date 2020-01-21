@@ -14,3 +14,5 @@ RUN go build .
 EXPOSE 8080
 #最终运行docker的命令
 ENTRYPOINT ["./start.sh"]
+#创建挂载点
+VOLUME ["/root/go/src/github.com/denyu95/life/logs"]

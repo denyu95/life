@@ -7,18 +7,18 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	"github.com/sirupsen/logrus"
 
-	"github.com/denyu95/life/pkg/setting"
+	"github.com/denyu95/life/conf"
 )
 
 var _db *gorm.DB
 
 func Init() {
-	username := setting.MySql.Username //账号
-	password := setting.MySql.Password //密码
-	host := setting.MySql.Host         //数据库地址，可以是Ip或者域名
-	port := setting.MySql.Port         //数据库端口
-	dbName := setting.MySql.DBName     //数据库名
-	timeout := setting.MySql.Timeout   //连接超时，10秒
+	username := conf.MySql.Username //账号
+	password := conf.MySql.Password //密码
+	host := conf.MySql.Host         //数据库地址，可以是Ip或者域名
+	port := conf.MySql.Port         //数据库端口
+	dbName := conf.MySql.DBName     //数据库名
+	timeout := conf.MySql.Timeout   //连接超时，10秒
 
 	// 拼接下dsn参数, dsn格式可以参考上面的语法，这里使用Sprintf动态拼接dsn参数，因为一般数据库连接参数，我们都是保存在配置文件里面，需要从配置文件加载参数，然后拼接dsn。
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local&timeout=%s", username, password, host, port, dbName, timeout)

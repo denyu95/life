@@ -22,6 +22,6 @@ func (u *DepositRecord) Add() error {
 	return u.DaoBase.Add(u)
 }
 
-func (u *DepositRecord) GetRecordByConds(conds map[string]interface{}, order string) error {
+func (u *DepositRecord) GetRecordByConds(conds map[string]map[string]interface{}, order string) error {
 	return u.DaoBase.GetRecordByConds(u, conds, order)
 }

@@ -23,6 +23,6 @@ func (u *User) Add() error {
 	return u.DaoBase.Add(u)
 }
 
-func (u *User) GetRecordByConds(conds map[string]interface{}, order string) error {
+func (u *User) GetRecordByConds(conds map[string]map[string]interface{}, order string) error {
 	return u.DaoBase.GetRecordByConds(u, conds, order)
 }

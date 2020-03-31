@@ -6,20 +6,19 @@ import (
 	"regexp"
 	"runtime"
 	"strings"
-
-	"github.com/satori/go.uuid"
-	"github.com/sirupsen/logrus"
-
 	"time"
+
+	uuid "github.com/satori/go.uuid"
+	"github.com/sirupsen/logrus"
 
 	"github.com/denyu95/life/pkg/convertor"
 	"github.com/denyu95/life/pkg/qq/api"
 )
 
 type QQEvent struct {
-	reqParam *ReqParam
+	reqParam   *ReqParam
 	privateMsg *PrivateMsg
-	groupMsg *GroupMsg
+	groupMsg   *GroupMsg
 }
 
 func NewQQEvent() *QQEvent {
@@ -28,8 +27,8 @@ func NewQQEvent() *QQEvent {
 
 type ReqParam struct {
 	Uid         string
-	Sex			string
-	Nickname	string
+	Sex         string
+	Nickname    string
 	Logger      *logrus.Entry `json:"-"`
 	TimeNow     time.Time
 	RegexResult []string
@@ -37,17 +36,17 @@ type ReqParam struct {
 
 // 私聊
 type PrivateMsg struct {
-	Font        float64       `json:"font"`
-	Message     string        `json:"message"`
-	MessageId   int           `json:"message_id"`
-	MessageType string        `json:"message_type"`
-	PostType    string        `json:"post_type"`
-	RawMessage  string        `json:"raw_message"`
-	SelfId      float64       `json:"self_id"`
-	Sender      Sender        `json:"sender"`
-	SubType     string        `json:"sub_type"`
-	Time        float64       `json:"time"`
-	UserId      float64       `json:"user_id"`
+	Font        float64 `json:"font"`
+	Message     string  `json:"message"`
+	MessageId   int     `json:"message_id"`
+	MessageType string  `json:"message_type"`
+	PostType    string  `json:"post_type"`
+	RawMessage  string  `json:"raw_message"`
+	SelfId      float64 `json:"self_id"`
+	Sender      Sender  `json:"sender"`
+	SubType     string  `json:"sub_type"`
+	Time        float64 `json:"time"`
+	UserId      float64 `json:"user_id"`
 }
 
 // 群聊
@@ -173,8 +172,8 @@ func (qqEvent *QQEvent) OnGroupMsgEvent(param map[string]interface{}, strRegex s
 		outputMsg := callMsgEvent(f).do(qqEvent.reqParam)
 		api.SendMsg(map[string]interface{}{
 			"group_id": qqEvent.groupMsg.GroupId,
-			"user_id": qqEvent.reqParam.Uid,
-			"message": "[CQ:at,qq=" + qqEvent.reqParam.Uid + "] " + outputMsg,
+			"user_id":  qqEvent.reqParam.Uid,
+			"message":  "[CQ:at,qq=" + qqEvent.reqParam.Uid + "] " + outputMsg,
 		})
 
 		qqEvent.reqParam.Logger = qqEvent.reqParam.Logger.WithField("output", outputMsg)

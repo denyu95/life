@@ -11,20 +11,29 @@ func (b DaoBase) Add(m interface{}) error {
 	return db.Create(m).Error
 }
 
-func (b *DaoBase) GetRecordByConds(m interface{}, conds map[string]interface{}, order string) error {
+func (b DaoBase) Update(m interface{}) error {
+	db := db.GetDB()
+	return db.Save(m).Error
+}
+
+func (b *DaoBase) GetRecordByConds(m interface{}, conds map[string]map[string]interface{}, order string) error {
 	query := ""
 	args := make([]interface{}, 0)
 	if conds != nil {
 		for k, v := range conds {
-			query += k + " = ? AND "
-			args = append(args, v)
+			for kk, vv := range v {
+				query += k + " " + kk + " ? AND "
+				args = append(args, vv)
+			}
 		}
 		if query[len(query)-4:len(query)-1] == "AND" {
 			query = query[0 : len(query)-4]
 		}
 	}
 
-	err := db.GetDB().Where(query, args).
+	// 可以开启调试
+	//err := db.GetDB().Debug().Where(query, args...).
+	err := db.GetDB().Where(query, args...).
 		Order(order).
 		First(m).
 		GetErrors()

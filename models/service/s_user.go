@@ -62,8 +62,8 @@ func SayHello(p *event.ReqParam) (replyMsg string) {
 
 	user := dao.User{}
 
-	user.GetRecordByConds(map[string]interface{}{
-		"uid": p.Uid,
+	user.GetRecordByConds(map[string]map[string]interface{}{
+		"uid": {"=": p.Uid},
 	}, "")
 
 	sex := "小哥哥"

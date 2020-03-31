@@ -9,25 +9,27 @@ import (
 	"github.com/urfave/cli"
 
 	"github.com/denyu95/life/cmd"
+	"github.com/denyu95/life/conf"
+	"github.com/denyu95/life/models/dao"
 	"github.com/denyu95/life/pkg/db"
 	"github.com/denyu95/life/pkg/log"
 	qqApi "github.com/denyu95/life/pkg/qq/api"
-	"github.com/denyu95/life/pkg/setting"
 )
 
 const Version = "1.0"
 
 // 工程初始化，初始化顺序不要改变
 func init() {
-	setting.Init()
+	conf.Init()
 
 	logLevel := logrus.InfoLevel
-	if setting.Log.Level == "debug" {
+	if conf.Log.Level == "debug" {
 		logLevel = logrus.DebugLevel
 	}
-	log.Init(setting.Log.Path, time.Hour, time.Hour*24*7, logLevel)
+	log.Init(conf.Log.Path, time.Hour, time.Hour*24*7, logLevel)
 	db.Init()
 	qqApi.Init()
+	dao.InitScheduleJob()
 }
 
 // 1 ） 获取单个对象的方法用 get 做前缀。

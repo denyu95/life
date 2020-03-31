@@ -1,14 +1,14 @@
 package api
 
 import (
+	"github.com/denyu95/life/conf"
 	"github.com/denyu95/life/pkg/http"
-	"github.com/denyu95/life/pkg/setting"
 )
 
 var qqApi http.Api
 
 func Init() {
-	qqApi = http.NewApi(setting.Api.QQBaseUrl)
+	qqApi = http.NewApi(conf.Api.QQBaseUrl)
 }
 
 // @title	SendPrivateMsg

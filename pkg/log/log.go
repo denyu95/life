@@ -196,7 +196,7 @@ func newLfsHook(path string, rotationTime, maxAge time.Duration) logrus.Hook {
 		logrus.WarnLevel:  warnWriter,
 		logrus.ErrorLevel: errorWriter,
 		logrus.FatalLevel: fatalWriter,
-	//}, &MyFormatter{})
+		//}, &MyFormatter{})
 	}, &logrus.TextFormatter{TimestampFormat: "2006-01-02 15:04:05"})
 
 	return lfsHook

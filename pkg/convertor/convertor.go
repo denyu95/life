@@ -44,6 +44,15 @@ func ToInt(v interface{}) (int, error) {
 	return strconv.Atoi(strV)
 }
 
+func MustInt(v interface{}) int {
+	strV := ToString(v)
+	i, err := strconv.Atoi(strV)
+	if err != nil {
+		return 0
+	}
+	return i
+}
+
 func ToInt64(v interface{}) (int64, error) {
 	strV := ToString(v)
 	return strconv.ParseInt(strV, 10, 64)
@@ -52,6 +61,15 @@ func ToInt64(v interface{}) (int64, error) {
 func ToBool(v interface{}) (bool, error) {
 	strV := ToString(v)
 	return strconv.ParseBool(strV)
+}
+
+func MustBool(v interface{}) bool {
+	strV := ToString(v)
+	b, err := strconv.ParseBool(strV)
+	if err != nil {
+		return false
+	}
+	return b
 }
 
 func ToFloat32(v interface{}) (float32, error) {

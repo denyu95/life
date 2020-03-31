@@ -1,14 +1,15 @@
 package service
 
 import (
-	"github.com/denyu95/life/pkg/qq/event"
-	"github.com/denyu95/life/conf"
-	"github.com/denyu95/life/pkg/convertor"
-	"github.com/denyu95/life/models/dao"
-	"time"
 	"fmt"
 	"strconv"
+	"time"
+
+	"github.com/denyu95/life/conf"
+	"github.com/denyu95/life/models/dao"
+	"github.com/denyu95/life/pkg/convertor"
 	"github.com/denyu95/life/pkg/db"
+	"github.com/denyu95/life/pkg/qq/event"
 )
 
 // 保存消费记录
@@ -34,9 +35,9 @@ func SaveSpendRecord(p *event.ReqParam) (replyMsg string) {
 	}
 
 	spendRecord := dao.SpendRecord{
-		Uid:p.Uid,
-		Money:money,
-		Remark: remark,
+		Uid:      p.Uid,
+		Money:    money,
+		Remark:   remark,
 		CreateAt: p.TimeNow,
 		UpdateAt: p.TimeNow,
 	}
@@ -69,13 +70,13 @@ func ListSomeTimeSpendRecord(p *event.ReqParam) (replyMsg string) {
 		// 查询月份区间
 	} else if startDate != "" {
 		// 查询指定月份
-		firstOfMonth, _ := time.Parse("2006-01-02 15:04:05", startDate + "-01 00:00:00")
+		firstOfMonth, _ := time.Parse("2006-01-02 15:04:05", startDate+"-01 00:00:00")
 		lastOfMonth := firstOfMonth.AddDate(0, 1, -1)
 
 		strFirstOfMonth := firstOfMonth.Format("2006-01-02") + " 00:00:00"
 		strLastOfMonth := lastOfMonth.Format("2006-01-02") + " 23:59:59"
 		spendRecords, _ = spendRecord.GetRecordsByConds(map[string]map[string]interface{}{
-			"createAt": {">=" : strFirstOfMonth, "<=" : strLastOfMonth},
+			"createAt": {">=": strFirstOfMonth, "<=": strLastOfMonth},
 		}, "uid ASC, createAt ASC")
 
 		outStr := "—————————————\n"
@@ -96,8 +97,8 @@ func ListSomeTimeSpendRecord(p *event.ReqParam) (replyMsg string) {
 		for k, v := range out {
 			user := dao.User{}
 
-			user.GetRecordByConds(map[string]interface{}{
-				"uid": k,
+			user.GetRecordByConds(map[string]map[string]interface{}{
+				"uid": {"=": k},
 			}, "")
 			outStr += user.Name + "\n"
 			var totalMoney float32
@@ -132,7 +133,7 @@ func ListSomeTimeSpendRecord(p *event.ReqParam) (replyMsg string) {
 
 		outStr += "　　　　　全员总计：" + strconv.FormatFloat(float64(allTotalMoney), 'f', 2, 32)
 
-		replyMsg = fmt.Sprintf(replyMsg, "< " + startDate + " > ", outStr)
+		replyMsg = fmt.Sprintf(replyMsg, "< "+startDate+" > ", outStr)
 	} else {
 		// 查询本月
 		now := time.Now()
@@ -145,7 +146,7 @@ func ListSomeTimeSpendRecord(p *event.ReqParam) (replyMsg string) {
 		strFirstOfMonth := firstOfMonth.Format("2006-01-02") + " 00:00:00"
 		strLastOfMonth := lastOfMonth.Format("2006-01-02") + " 23:59:59"
 		spendRecords, _ = spendRecord.GetRecordsByConds(map[string]map[string]interface{}{
-			"createAt": {">=" : strFirstOfMonth, "<=" : strLastOfMonth},
+			"createAt": {">=": strFirstOfMonth, "<=": strLastOfMonth},
 		}, "uid ASC, createAt ASC")
 
 		outStr := "—————————————\n"
@@ -166,8 +167,8 @@ func ListSomeTimeSpendRecord(p *event.ReqParam) (replyMsg string) {
 		for k, v := range out {
 			user := dao.User{}
 
-			user.GetRecordByConds(map[string]interface{}{
-				"uid": k,
+			user.GetRecordByConds(map[string]map[string]interface{}{
+				"uid": {"=": k},
 			}, "")
 			outStr += user.Name + "\n"
 			var totalMoney float32
@@ -201,7 +202,6 @@ func ListSomeTimeSpendRecord(p *event.ReqParam) (replyMsg string) {
 		}
 
 		outStr += "　　　　　全员总计：" + strconv.FormatFloat(float64(allTotalMoney), 'f', 2, 32) + "\n"
-
 
 		// 算余额
 		var totalMoney float32

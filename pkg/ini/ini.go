@@ -75,8 +75,8 @@ func NewIni(filePath string) (*Ini, error) {
 			section = lineInfo[1 : len(lineInfo)-1]
 			cf.conf[section] = make(map[string]string)
 		} else {
-			replacer := strings.NewReplacer(" ", "")
-			lineInfo = replacer.Replace(lineInfo)
+			//replacer := strings.NewReplacer(" ", "")
+			//lineInfo = replacer.Replace(lineInfo)
 			spl := strings.Split(lineInfo, "=")
 
 			// 注释的内容
@@ -87,8 +87,9 @@ func NewIni(filePath string) (*Ini, error) {
 			if len(spl) < 2 {
 				return nil, errors.New("Error:failed to parse key value:\"" + lineInfo + "\"")
 			}
-			key := strings.Replace(spl[0], ".", "_", -1)
-			cf.conf[section][key] = spl[1]
+
+			key := strings.Replace(strings.TrimSpace(spl[0]), ".", "_", -1)
+			cf.conf[section][key] = strings.TrimSpace(spl[1])
 		}
 	}
 

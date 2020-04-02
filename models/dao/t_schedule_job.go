@@ -52,7 +52,7 @@ func (s ScheduleJob) Run() {
 	childJobId, _ := c.AddFunc(conf.Cron.Boom, func() {
 		api.SendPrivateMsg(map[string]interface{}{
 			"user_id": s.Uid,
-			"message": msg,
+			"message": "更频繁的" + msg,
 		})
 	})
 

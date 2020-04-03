@@ -10,4 +10,4 @@ yum -y install kde-l10n-Chinese glibc-common
 LANG="zh_CN.UTF-8"
 echo "export LC_ALL=zh_CN.UTF-8"  >>  /etc/profile
 
-./life coolq
+env GO_ENV=prod ./life coolq

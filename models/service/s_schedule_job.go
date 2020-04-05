@@ -39,7 +39,8 @@ func SaveScheduleJob(p *event.ReqParam) (replyMsg string) {
 
 	if err := sch.Add(); err != nil {
 		p.Logger.Error(err)
-		replyMsg = conf.ScheduleJobSuccess
+		replyMsg = conf.ScheduleJobFailed
+		return
 	}
 
 	c := schedule.GetCron()

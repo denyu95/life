@@ -18,12 +18,14 @@ func HandlePrivateMsg(param map[string]interface{}) {
 	// 查看消费清单（不填日期默认查询本月消费）《清单》《清单，2020-01》《清单，2020-01，2020-02》
 	event.OnPrivateMsgEvent(param, `^清单(?:(?:,|，)(\d{4}-\d{2}))?(?:(?:,|，)(\d{4}-\d{2}))?$`, service.ListSomeTimeSpendRecord)
 
-	// 新增目标
-	event.OnPrivateMsgEvent(param, `^目标(?:,|，)([^\n]+)(?:,|，)(\d+)$`, service.SaveScheduleJob)
-	// 目标完成记录
-	event.OnPrivateMsgEvent(param, `^收到(?:,|，)(\d{0,9})$`, service.SaveScheduleRecord)
-	// 更新目标完成记录
-	event.OnPrivateMsgEvent(param, `^完成(?:,|，)(\d{0,9})(?:,|，)(\d)$`, service.UpdateScheduleRecord)
+	// 新增提醒
+	event.OnPrivateMsgEvent(param, `^提醒(?:,|，)([^\n]+)(?:,|，)(\d|1\d|2[0-3])$`, service.SaveSchedule)
+	// 查看提醒列表
+	event.OnPrivateMsgEvent(param, `^查看提醒$`, service.ListSchedule)
+	// 移除提醒
+	event.OnPrivateMsgEvent(param, `^删除提醒(?:,|，)(\d+)$`, service.RemoveSchedule)
+	// 收到提醒
+	event.OnPrivateMsgEvent(param, `^收到$`, service.UpdateScheduleRecord)
 }
 
 func HandleGroupMsg(param map[string]interface{}) {

@@ -59,6 +59,6 @@ func Init() {
 	Log.Level = i.String("log", "level")
 
 	// Cron配置
-	Cron.Goal = i.String("cron", "goal")
+	//Cron.Goal = i.String("cron", "goal")
 	Cron.Boom = i.String("cron", "boom")
 }

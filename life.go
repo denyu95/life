@@ -29,7 +29,7 @@ func init() {
 	log.Init(conf.Log.Path, time.Hour, time.Hour*24*7, logLevel)
 	db.Init()
 	qqApi.Init()
-	dao.InitScheduleJob()
+	dao.InitSchedule()
 }
 
 // 1 ） 获取单个对象的方法用 get 做前缀。
@@ -40,7 +40,7 @@ func init() {
 // 6 ） 修改的方法用 update 做前缀。
 func main() {
 	c := make(chan os.Signal)
-	signal.Notify(c)
+	signal.Notify(c, os.Interrupt)
 	defer func() {
 		logrus.Info("...关闭数据库连接...")
 		db.GetDB().Close()
@@ -62,5 +62,5 @@ func do() {
 	app.Commands = []cli.Command{
 		cmd.Coolq,
 	}
-	app.Run(os.Args)
+	_ = app.Run(os.Args)
 }

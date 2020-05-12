@@ -19,14 +19,16 @@ const (
 	GetSpendRecordsFailed  = "查询消费记录异常，请联系管理员 (;´༎ຶД༎ຶ`)"
 	GetSpendRecordsSuccess = "%s清单如下：\n%s"
 
-	// 目标排期
-	ScheduleJobSuccess = "目标排期成功 ٩(˃̶͈̀௰˂̶͈́)و"
-	ScheduleJobFailed  = "目标排期失败 (;´༎ຶД༎ຶ`)"
+	// 提醒排期
+	ScheduleSuccess       = "排期成功 ٩(˃̶͈̀௰˂̶͈́)و"
+	ScheduleFailed        = "排期失败 (;´༎ຶД༎ຶ`)"
+	ListSchedule          = "提醒排期如下：\n%s"
+	RemoveScheduleSuccess = "删除提醒成功 ٩(˃̶͈̀௰˂̶͈́)و"
+	RemoveScheduleFailed  = "删除提醒失败 (;´༎ຶД༎ຶ`)"
 
-	// 目标完成记录
-	JobRecordStart   = "开启今日目标，加油 ٩(˃̶͈̀௰˂̶͈́)و"
-	JobRecordSuccess = "距离目标更近了一步，坚持了 %d 天，还差 %d 天，加油 ٩(˃̶͈̀௰˂̶͈́)و"
-	JobRecordOhNo    = "意志力不坚定啦，扣除 %d 天，一定要加油啊！！！"
-	JobRecordFailed  = "记录完成情况失败，再试一次 (;´༎ຶД༎ຶ`)"
-	JobFinish        = "完成目标 ٩(˃̶͈̀௰˂̶͈́)و"
+	// 收到提醒记录
+
+	JobRecordStopDo  = "还不能做收到提醒操作哦!"
+	JobRecordSuccess = "坚持就是胜利，加油 ٩(˃̶͈̀௰˂̶͈́)و"
+	JobRecordFailed  = "收到提醒失败，再试一次 (;´༎ຶД༎ຶ`)"
 )

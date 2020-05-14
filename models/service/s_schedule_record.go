@@ -31,7 +31,6 @@ func UpdateScheduleRecord(p *event.ReqParam) (replyMsg string) {
 				"id": {"=": sjr.ScheduleId},
 			}, "")
 			c := schedule.GetCron()
-			c.Remove(cron.EntryID(sch.JobId))
 			c.Remove(cron.EntryID(sch.ChildJobId))
 		}
 		replyMsg = conf.JobRecordSuccess

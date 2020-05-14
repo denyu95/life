@@ -65,7 +65,6 @@ func (s Schedule) Run() {
 		schR.ScheduleId = s.Id
 		schR.Uid = s.Uid
 		schR.IsReceive = false
-		schR.ReceiveAt = time.Date(0, 0, 0, 0, 0, 0, 0, time.Local)
 		err := schR.Add()
 		if err != nil {
 			logrus.Error(err)

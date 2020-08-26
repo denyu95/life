@@ -135,6 +135,7 @@ func (qqEvent *QQEvent) OnPrivateMsgEvent(param map[string]interface{}, strRegex
 		regexResult := regex.FindStringSubmatch(qqEvent.privateMsg.Message)
 		qqEvent.reqParam.RegexResult = regexResult
 		outputMsg := callMsgEvent(f).do(qqEvent.reqParam)
+		logrus.Debug("私聊----")
 		api.SendMsg(map[string]interface{}{
 			"user_id": qqEvent.reqParam.Uid,
 			"message": outputMsg,
@@ -170,10 +171,14 @@ func (qqEvent *QQEvent) OnGroupMsgEvent(param map[string]interface{}, strRegex s
 		regexResult := regex.FindStringSubmatch(qqEvent.groupMsg.Message)
 		qqEvent.reqParam.RegexResult = regexResult
 		outputMsg := callMsgEvent(f).do(qqEvent.reqParam)
+		logrus.Debug("群聊----")
+		logrus.Debug(qqEvent.groupMsg.GroupId)
+		logrus.Debug(qqEvent.reqParam.Uid)
 		api.SendMsg(map[string]interface{}{
-			"group_id": qqEvent.groupMsg.GroupId,
-			"user_id":  qqEvent.reqParam.Uid,
-			"message":  "[CQ:at,qq=" + qqEvent.reqParam.Uid + "] " + outputMsg,
+			"message_type": "group",
+			"group_id":     qqEvent.groupMsg.GroupId,
+			"user_id":      qqEvent.reqParam.Uid,
+			"message":      "[CQ:at,qq=" + qqEvent.reqParam.Uid + "] " + outputMsg,
 		})
 
 		qqEvent.reqParam.Logger = qqEvent.reqParam.Logger.WithField("output", outputMsg)

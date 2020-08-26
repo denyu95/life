@@ -10,7 +10,6 @@ import (
 
 	"github.com/denyu95/life/cmd"
 	"github.com/denyu95/life/conf"
-	"github.com/denyu95/life/models/dao"
 	"github.com/denyu95/life/pkg/db"
 	"github.com/denyu95/life/pkg/log"
 	qqApi "github.com/denyu95/life/pkg/qq/api"
@@ -29,7 +28,7 @@ func init() {
 	log.Init(conf.Log.Path, time.Hour, time.Hour*24*7, logLevel)
 	db.Init()
 	qqApi.Init()
-	dao.InitSchedule()
+	// dao.InitSchedule()
 }
 
 // 1 ） 获取单个对象的方法用 get 做前缀。

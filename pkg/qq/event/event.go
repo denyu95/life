@@ -136,10 +136,13 @@ func (qqEvent *QQEvent) OnPrivateMsgEvent(param map[string]interface{}, strRegex
 		qqEvent.reqParam.RegexResult = regexResult
 		outputMsg := callMsgEvent(f).do(qqEvent.reqParam)
 		logrus.Debug("私聊----")
-		api.SendMsg(map[string]interface{}{
+		logrus.Debug(qqEvent.reqParam.Uid)
+		logrus.Debug(outputMsg)
+		result := api.SendMsg(map[string]interface{}{
 			"user_id": qqEvent.reqParam.Uid,
 			"message": outputMsg,
 		})
+		logrus.Debug(result)
 
 		qqEvent.reqParam.Logger.WithField("output", outputMsg)
 		qqEvent.reqParam.Logger.Info("success")

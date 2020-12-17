@@ -10,6 +10,7 @@ import (
 	"github.com/denyu95/life/pkg/convertor"
 	"github.com/denyu95/life/pkg/db"
 	"github.com/denyu95/life/pkg/qq/event"
+	"github.com/sirupsen/logrus"
 )
 
 // 保存消费记录
@@ -75,10 +76,12 @@ func ListSomeTimeSpendRecord(p *event.ReqParam) (replyMsg string) {
 
 		strFirstOfMonth := firstOfMonth.Format("2006-01-02") + " 00:00:00"
 		strLastOfMonth := lastOfMonth.Format("2006-01-02") + " 23:59:59"
+		logrus.Debug(strFirstOfMonth)
+		logrus.Debug(strLastOfMonth)
 		spendRecords, _ = spendRecord.GetRecordsByConds(map[string]map[string]interface{}{
 			"createAt": {">=": strFirstOfMonth, "<=": strLastOfMonth},
 		}, "uid ASC, createAt ASC")
-
+		logrus.Debug(spendRecords)
 		outStr := "—————————————\n"
 		out := make(map[string][]dao.SpendRecord, 0)
 		for _, spendRecord := range spendRecords {
